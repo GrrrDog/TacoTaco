@@ -8,15 +8,15 @@ def parse_args():
         description="A converter of a Tacacs+ packet to a format of HashCat. ")
 
     parser.add_argument(
-        '-t', '--type', type=str, help="Type of a packet (in HEX). \1 - SSH, a packet from a cisco device to a tacacs+ server. You should set 12345678 as a username; " +
-                                       "2 - Telnet, a packet from a tacacs+ server to a cisco device. "+
+        '-t', '--type', type=str, help="Type of a packet. \1 - SSH only, the first packet from a cisco device to a tacacs+ server. You should set 12345678 as a username; " +
+                                       "2 - Telnet/SSH, the second authentication packet (from a tacacs+ server to a cisco device) "+
                                        "You should set a greeting meesage of the cisco device in -m. "+
                                        "A default value is \"\\nUser Access Verification\\n\\nUsername: \". Set \"Password:\" for SSH",  required=True)
     parser.add_argument(
-        '-m', '--mess', type=str, help='Message or IP depending on the type of the packet', default="\nUser Access Verification\n\nUsername: ", required=False)
+        '-m', '--mess', type=str, help='Message for the second type', default="\nUser Access Verification\n\nUsername: ", required=False)
 
     parser.add_argument(
-        '-p', '--packet', type=str, help='Tacacs+ packet in hex', required=True)
+        '-p', '--packet', type=str, help='A Tacacs+ packet in hex', required=True)
     parser.add_argument(
         '-v', '--verbose', help='Verbose mode', action="store_true", dest="verbose", default=False, required=False)
     args = parser.parse_args()

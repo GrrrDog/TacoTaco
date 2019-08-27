@@ -1,6 +1,8 @@
 # TacoTaco
 TacoTaco is a project about attacks on TACACS+ protocol.
 
+--------------------
+
 1) tac2cat.py - A converter of a TACACS+ packet to a format of the HashCat. The script helps you to extract a MD5_1 hash from a TACACS+ authentication packet. Then you can perform a local brute force attack on the MD5 hash and get a PSK.
 
 Example:
@@ -13,14 +15,31 @@ Where:
   -m "Password: " – a greeting message from a ssh service of a Cisco device
   -p – a hex stream of the second packet (TACACS+ layer) from the Wireshark.
 ```
+
+--------------------
+
 2) tacoflip.py is a script that you the opportunity to bypass authentication and authorization on a Cisco device that uses a TACACS+ server for AAA. You just need to perform a MitM attack on the Cisco device and the TACACS+ server (arp spoofing, for example)
 
 Example:
 ```
   python tacoflip.py –t 192.168.0.100
 ```
-Where 192.168.0.100 is an IP address of a TACACS+ server
+Where 192.168.0.100 is an IP address of a TACACS+ server.
 
 The video shows whole process of the attack: http://www.youtube.com/watch?v=HdTib8wftHA
 
+  _Note!_
+  Because tacoflip.py works as TCP proxy, if TACACS server is located within different broadcast domain, 
+  you may want to use NAT in order to redirect intercepted TACACS communication to script listening on 0.0.0.0:49.
+  Example commands:
+```
+iptables -t nat -A PREROUTING -p tcp --dport 49 -d <TACACS_SERVER> -j DNAT --to-destination <YOUR_IP>
+iptables -t nat -A POSTROUTING -p tcp --dport 49 -s <YOUR_IP> -j SNAT --to <CISCO_TARGET>
+```
+
+--------------------
+
 3) sample dir consists some examples: a router config, a tac_plus config and pcap files of authentication process (telnet, ssh).
+
+
+

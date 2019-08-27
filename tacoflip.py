@@ -32,6 +32,8 @@ class Forward:
     def start(self, host, port):
         try:
             self.forward.connect((host, port))
+            if verbose:
+                print("Connected to {}:{}".format(ip,49))
             return self.forward
         except Exception, e:
             print e
@@ -47,6 +49,8 @@ class TheServer:
         self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server.bind((host, port))
         self.server.listen(200)
+        if verbose:
+            print("Listening on {}:{}".format(host,port))
 
     def main_loop(self):
         self.input_list.append(self.server)
@@ -59,7 +63,16 @@ class TheServer:
                     self.on_accept()
                     break
 
-                self.data = self.s.recv(buffer_size)
+                try:
+                    self.data = self.s.recv(buffer_size)
+                except socket.error as e:
+                    print(e)
+                    self.on_close()
+                    break
+                except Exception as ex:
+                    self.on_close()
+                    print(ex)
+                    break
                 if len(self.data) == 0:
                     self.on_close()
                     break
@@ -81,7 +94,14 @@ class TheServer:
             clientsock.close()
 
     def on_close(self):
-        print self.s.getpeername(), "has disconnected"
+        try:
+            print self.s.getpeername(), "has disconnected"
+        except socket.error as e:
+            print("Disconnected: {}".format(e))
+        except Exception as ex:
+            print("Unhandled exception..")
+            print(ex)
+            sys.exit(1)
         # remove objects from input_list
         self.input_list.remove(self.s)
         self.input_list.remove(self.channel[self.s])
@@ -150,14 +170,12 @@ def verb(desc, val=""):
 
 
 if __name__ == '__main__':
-    print ("")
-
-    print("TacoFlip / Tacacs+ Mitm Auth bypass v0.1 beta")
-    print("Alexey Tyurin - agrrrdog [at] gmail.com")
-    print
-
+    
+    print("\nTacoFlip / Tacacs+ Mitm Auth bypass v0.1 beta")
+    print("Alexey Tyurin - agrrrdog [at] gmail.com\n")
     ip, verbose = parse_args()
     forward_to = (ip, 49)
+    
     server = TheServer('', 49)
     try:
         server.main_loop()
